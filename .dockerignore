@@ -1,6 +1,7 @@
 *.md
 *.log
 *.txt
+!check.txt
 .git
 .github
 .circleci
