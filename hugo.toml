@@ -1,0 +1,3 @@
+baseURL = "https://hugo-u39205.vm.elestio.app"
+languageCode = "en-us"
+title = "My Hugo Site"

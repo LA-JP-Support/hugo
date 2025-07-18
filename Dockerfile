@@ -1,99 +1,47 @@
-# GitHub:       https://github.com/gohugoio
-# Twitter:      https://twitter.com/gohugoio
-# Website:      https://gohugo.io/
-
-ARG GO_VERSION="1.24"
-ARG ALPINE_VERSION="3.22"
-ARG DART_SASS_VERSION="1.79.3"
-
-FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.5.0 AS xx
-FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS gobuild
-FROM golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS gorun
+FROM klakegg/hugo:ubuntu AS builder
+#Add a work directory
+WORKDIR /app
+#Copy dependencies
+COPY ./check.txt ./package*.json ./package-lock.json[t] ./yarn.lock[t] ./
 
 
-FROM gobuild AS build
 
-RUN apk add clang lld
+#Install dependencies
+#Copy app files
+COPY . .
+#Cache and Install dependencies
 
-# Set up cross-compilation helpers
-COPY --from=xx / /
 
-ARG TARGETPLATFORM
-RUN xx-apk add musl-dev gcc g++
 
-# Optionally set HUGO_BUILD_TAGS to "none" or "withdeploy" when building like so:
-# docker build --build-arg HUGO_BUILD_TAGS=withdeploy .
-#
-# We build the extended version by default.
-ARG HUGO_BUILD_TAGS="extended"
-ENV CGO_ENABLED=1
-ENV GOPROXY=https://proxy.golang.org
-ENV GOCACHE=/root/.cache/go-build
-ENV GOMODCACHE=/go/pkg/mod
-ARG TARGETPLATFORM
+#.env Source destination argument
+ARG source_file=./.env
+ARG destination_dir=./.env
 
-WORKDIR /go/src/github.com/gohugoio/hugo
+#.env copying management
+RUN if [ -f "$source_file" ]; then \
+        if [ "$source_file" != "$destination_dir" ]; then \
+            echo "Copying $source_file to $destination_dir"; \
+            cp "$source_file" "$destination_dir"; \
+        else \
+            echo "Source and destination paths are the same; skipping copy."; \
+        fi \
+    else \
+        echo ".env has been added to dockerignore; skipping copy; if you want to copy it, remove it from dockerignore."; \
+    fi
 
-# For  --mount=type=cache the value of target is the default cache id, so
-# for the go mod cache it would be good if we could share it with other Go images using the same setup,
-# but the go build cache needs to be per platform.
-# See this comment: https://github.com/moby/buildkit/issues/1706#issuecomment-702238282
-RUN --mount=target=. \
-    --mount=type=cache,target=/go/pkg/mod \
-    --mount=type=cache,target=/root/.cache/go-build,id=go-build-$TARGETPLATFORM <<EOT
-    set -ex
-    xx-go build -tags "$HUGO_BUILD_TAGS" -ldflags "-s -w -X github.com/gohugoio/hugo/common/hugo.vendorInfo=docker" -o /usr/bin/hugo
-    xx-verify /usr/bin/hugo
-EOT
 
-# dart-sass downloads the dart-sass runtime dependency
-FROM alpine:${ALPINE_VERSION} AS dart-sass
-ARG TARGETARCH
-ARG DART_SASS_VERSION
-ARG DART_ARCH=${TARGETARCH/amd64/x64}
-WORKDIR /out
-ADD https://github.com/sass/dart-sass/releases/download/${DART_SASS_VERSION}/dart-sass-${DART_SASS_VERSION}-linux-${DART_ARCH}.tar.gz .
-RUN tar -xf dart-sass-${DART_SASS_VERSION}-linux-${DART_ARCH}.tar.gz
 
-FROM gorun AS final
+#Expose port
+EXPOSE 80 
+#Build command
 
-COPY --from=build /usr/bin/hugo /usr/bin/hugo
+RUN hugo 
+FROM nginx:alpine
+# Set working directory to nginx asset directory
+WORKDIR /usr/share/nginx/html
+# Remove default nginx static assets
+RUN rm -rf ./*
+# Copy static assets from builder stage
+COPY --from=builder /app/public .
 
-# libc6-compat  are required for extended libraries (libsass, libwebp).
-RUN apk add --no-cache \
-    libc6-compat \
-    git \
-    runuser \
-    nodejs \
-    npm
-
-RUN mkdir -p /var/hugo/bin /cache && \
-    addgroup -Sg 1000 hugo && \
-    adduser -Sg hugo -u 1000 -h /var/hugo hugo && \
-    chown -R hugo: /var/hugo /cache && \
-    # For the Hugo's Git integration to work.
-    runuser -u hugo -- git config --global --add safe.directory /project && \
-    # See https://github.com/gohugoio/hugo/issues/9810
-    runuser -u hugo -- git config --global core.quotepath false
-
-USER hugo:hugo
-VOLUME /project
-WORKDIR /project
-ENV HUGO_CACHEDIR=/cache
-ENV PATH="/var/hugo/bin:$PATH"
-
-COPY scripts/docker/entrypoint.sh /entrypoint.sh
-COPY --from=dart-sass /out/dart-sass /var/hugo/bin/dart-sass
-
-# Update PATH to reflect the new dependencies.
-# For more complex setups, we should probably find a way to
-# delegate this to the script itself, but this will have to do for now.
-# Also, the dart-sass binary is a little special, other binaries can be put/linked
-# directly in /var/hugo/bin.
-ENV PATH="/var/hugo/bin/dart-sass:$PATH"
-
-# Expose port for live server
-EXPOSE 1313
-
-ENTRYPOINT ["/entrypoint.sh"]
-CMD ["--help"]
+ENTRYPOINT ["nginx", "-g", "daemon off;"]
