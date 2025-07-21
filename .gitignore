@@ -1,0 +1,19 @@
+# Hugo生成ファイル
+public/
+resources/_gen/
+hugo_stats.json
+
+# Docker関連
+.env
+
+# OS固有ファイル
+.DS_Store
+Thumbs.db
+
+# エディタファイル
+*.swp
+*.swo
+*~
+
+# ログファイル
+*.log

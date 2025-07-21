@@ -1,9 +1,24 @@
 baseURL = "https://hugo-u39205.vm.elestio.app"
 languageCode = "ja"
 defaultContentLanguage = "ja"
-title = “高機能サイト構築サービス|株式会社インターワーク”
+title = "株式会社インターワーク"
 
 [params]
-  author = “インターワーク”
-  description = “LiveAgentとFlowhuntによるAIサイト構築”
-  defaultKeywords = ["hugo", “LiveAgent”, “Flowhunt”, “AIチャットボット”, “ヘルプデスク”,”チケットシステム”]
+  author = "株式会社インターワーク"
+  description = "高機能サイト構築サービス"
+  
+[[menu.main]]
+  name = "ホーム" 
+  url = "/"
+  weight = 1
+
+[[menu.main]]
+  name = "ブログ"
+  url = "/blog/"
+  weight = 2
+
+[[menu.main]]
+  name = "お問い合わせ"
+  url = "/contact"
+  weight = 3
+theme = "hugo-universal-theme"

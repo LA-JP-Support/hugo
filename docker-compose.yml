@@ -1,0 +1,18 @@
+version: "3.3"
+services:
+  app:
+    container_name: hugo
+    image: hugo
+    restart: always
+    build:
+      context: .
+    volumes: 
+      - ./src:/app/src
+    ports:
+      - 172.17.0.1:3000:80
+    environment:
+      DOMAIN: https://hugo-u39205.vm.elestio.app
+    env_file:
+      - .env
+
+
