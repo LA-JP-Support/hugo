@@ -1,11 +1,11 @@
 baseURL = "https://hugo-u39205.vm.elestio.app"
 languageCode = "ja"
 defaultContentLanguage = "ja"
-title = "AI対応高機能サイト構築サービス - 株式会社インターワーク"
+title = "AI対応の高機能サイト構築サービス - 株式会社インターワーク"
 
 [params]
   author = "株式会社インターワーク"
-  description = "AIに対応した高機能サイト構築サービス - 自動記事作成から、AIチャットボット"
+  description = "AIに対応した高機能サイト構築サービス - 自動記事作成から、AIチャットボット、AI対応のチケットシステム"
   
 [[menu.main]]
   name = "ホーム" 
