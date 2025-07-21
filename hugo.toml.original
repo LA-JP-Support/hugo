@@ -1,10 +1,10 @@
-baseURL = "https://hugo-u39205.vm.elestio.app" # Configure URL. if using gh-pages https://github.com/<username>/hugo-universal-theme URL: https://<username>.github.io/hugo-universal-theme/
-title = "株式会社インターワーク"
+baseurl = "https://devcows.github.io/hugo-universal-theme/" # Configure URL. if using gh-pages https://github.com/<username>/hugo-universal-theme URL: https://<username>.github.io/hugo-universal-theme/
+title = "Universal"
 theme = "hugo-universal-theme"
 themesDir = "../.."
-languageCode = "ja"
+languageCode = "en-us"
 # Site language. Available translations in the theme's `/i18n` directory.
-defaultContentLanguage = "ja"
+defaultContentLanguage = "en"
 
 # number of words of summarized post content (default 70)
 summaryLength = 70
