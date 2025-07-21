@@ -1,11 +1,11 @@
 baseURL = "https://hugo-u39205.vm.elestio.app"
 languageCode = "ja"
 defaultContentLanguage = "ja"
-title = "株式会社インターワーク"
+title = "AI対応高機能サイト構築サービス - 株式会社インターワーク"
 
 [params]
   author = "株式会社インターワーク"
-  description = "高機能サイト構築サービス"
+  description = "AIに対応した高機能サイト構築サービス - 自動記事作成から、AIチャットボット"
   
 [[menu.main]]
   name = "ホーム" 
@@ -21,4 +21,10 @@ title = "株式会社インターワーク"
   name = "お問い合わせ"
   url = "/contact"
   weight = 3
+
+[[menu.main]]
+  name = "サポートポータル"
+  url = "/faq"
+  weight = 4
+
 theme = "hugo-universal-theme"
