@@ -1,7 +1,7 @@
 baseURL = "https://hugo-u39205.vm.elestio.app"
 languageCode = "ja"
 defaultContentLanguage = "ja"
-title = “高機能サイト構築サービス：株式会社インターワーク”
+title = “高機能サイト構築サービス|株式会社インターワーク”
 
 [params]
   author = “インターワーク”
