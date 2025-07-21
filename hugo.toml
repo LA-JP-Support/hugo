@@ -39,22 +39,184 @@ summaryLength = 70
     [params.recent_posts]
         enable = true
 
+# Main menu
 [[menu.main]]
     name = "ホーム"
+    identifier = "menu.home"
     url = "/"
     weight = 1
 
 [[menu.main]]
-    name = "ブログ"
-    url = "/blog/"
+    name = "Option 1: Default Page"
+    url = "/"
+    weight = 1
+    parent = "menu.home"
+
+[[menu.main]]
+    name = "Option 2: Application"
+    url = "/"
+    weight = 2
+    parent = "menu.home"
+
+[[menu.main]]
+    name = "Option 3: Startup"
+    url = "/"
+    weight = 3
+    parent = "menu.home"
+
+[[menu.main]]
+    name = "機能"
+    identifier = "menu.features"
+    url = "/img/template-easy-customize.png"
     weight = 2
 
 [[menu.main]]
-    name = "お問い合わせ"
-    url = "/contact/"
+    name = "Shortcodes"
+    identifier = "section.shortcodes"
+    url = ""
+    weight = 1
+    parent = "menu.features"
+    post = 1
+
+[[menu.main]]
+    name = "Header variations"
+    identifier = "section.headervariations"
+    url = ""
+    weight = 2
+    parent = "menu.features"
+    post = 2
+
+[[menu.main]]
+    name = "Accordions"
+    url = ""
+    weight = 1
+    parent = "section.shortcodes"
+
+[[menu.main]]
+    name = "Alerts"
+    url = ""
+    weight = 2
+    parent = "section.shortcodes"
+
+[[menu.main]]
+    name = "Buttons"
+    url = ""
+    weight = 3
+    parent = "section.shortcodes"
+
+[[menu.main]]
+    name = "Content Boxes"
+    url = ""
+    weight = 4
+    parent = "section.shortcodes"
+
+[[menu.main]]
+    name = "ポートフォリオ"
+    identifier = "menu.portfolio"
+    url = "/img/template-homepage.png"
     weight = 3
 
 [[menu.main]]
-    name = "サポート"
-    url = "/faq/"
+    name = "Portfolio"
+    identifier = "section.portfolio"
+    url = ""
+    weight = 1
+    parent = "menu.portfolio"
+    post = 1
+
+[[menu.main]]
+    name = "2 Columns"
+    url = ""
+    weight = 1
+    parent = "section.portfolio"
+
+[[menu.main]]
+    name = "3 Columns"
+    url = ""
+    weight = 3
+    parent = "section.portfolio"
+
+[[menu.main]]
+    name = "4 Columns"
+    url = ""
+    weight = 5
+    parent = "section.portfolio"
+
+[[menu.main]]
+    name = "About"
+    identifier = "section.about"
+    url = ""
+    weight = 2
+    parent = "menu.portfolio"
+    post = 2
+
+[[menu.main]]
+    name = "About Us"
+    url = ""
+    weight = 1
+    parent = "section.about"
+
+[[menu.main]]
+    name = "Our Team"
+    url = ""
+    weight = 2
+    parent = "section.about"
+
+[[menu.main]]
+    name = "All Pages"
+    identifier = "menu.allpages"
+    url = ""
     weight = 4
+
+[[menu.main]]
+    name = "Home"
+    identifier = "section.ap-home"
+    url = ""
+    weight = 1
+    parent = "menu.allpages"
+    post = 1
+
+[[menu.main]]
+    name = "ブログ"
+    identifier = "section.ap-blog"
+    url = "/blog/"
+    weight = 3
+    parent = "menu.allpages"
+    post = 4
+
+[[menu.main]]
+    name = "Blog Listing Big"
+    url = "/blog/"
+    weight = 1
+    parent = "section.ap-blog"
+
+[[menu.main]]
+    name = "ブログ"
+    identifier = "menu.blog"
+    url = "/blog/"
+    weight = 5
+
+[[menu.main]]
+    name = "サポート"
+    identifier = "menu.faq"
+    url = "/faq/"
+    weight = 6
+
+[[menu.main]]
+    name = "お問い合わせ"
+    identifier = "contact"
+    url = "/contact/"
+    weight = 7
+
+# Top bar social links menu
+[[menu.topbar]]
+    weight = 1
+    name = "Facebook"
+    url = "https://facebook.com"
+    pre = "<i class='fab fa-2x fa-facebook'></i>"
+
+[[menu.topbar]]
+    weight = 4
+    name = "X"
+    url = "https://x.com"
+    pre = "<i class='fab fa-2x fa-x-twitter'></i>"
