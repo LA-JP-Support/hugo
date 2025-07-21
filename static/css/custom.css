@@ -1,30 +1,16 @@
-/* Noto フォントをインポート */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;500;700&display=swap');
+/* your styles go here */
+/* Example site test */
 
-/* フォントの設定 */
-body, .navbar, .btn, .form-control {
-    font-family: 'Noto Sans JP', sans-serif !important;
+.box-image-text .image {
+    min-height: 190px;
+    max-height: 190px;
 }
 
-/* 見出しにNoto Serif JP を使用 */
-h1, h2, h3, h4, h5, h6, .heading-title {
-    font-family: 'Noto Serif JP', serif !important;
-    font-weight: 500;
+.box-image-text .image img {
+    max-height: 190px;
+    margin: auto;
 }
 
-/* ブログコンテンツ */
-.blog-post .content, .post-content {
-    font-family: 'Noto Sans JP', sans-serif;
-    line-height: 1.8;
-}
-
-/* 日本語の改行調整 */
-p {
-    line-height: 1.8;
-    word-break: break-word;
-}
-
-/* 日本語文字の間隔調整 */
-.japanese-text {
-    letter-spacing: 0.02em;
+.box-simple {
+    min-height: 230px;
 }

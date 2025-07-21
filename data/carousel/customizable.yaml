@@ -1,0 +1,10 @@
+weight: 1
+title: "AI対応サイト構築"
+description: |
+  <ul class="list-style-none">
+    <li>自動記事作成システム</li>
+    <li>AIチャットボット統合</li>
+    <li>24時間サポート体制</li>
+  </ul>
+image: "img/carousel/template-homepage.png"
+href: "/"

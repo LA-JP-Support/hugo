@@ -1,30 +1,90 @@
 baseURL = "https://hugo-u39205.vm.elestio.app"
 languageCode = "ja"
 defaultContentLanguage = "ja"
-title = "AI対応の高機能サイト構築サービス - 株式会社インターワーク"
+title = "AI対応高機能サイト構築サービス - 株式会社インターワーク"
+theme = "hugo-universal-theme"
+summaryLength = 70
+pluralizelisttitles = false
+
+[services]
+    [services.disqus]
+        shortname = ""
+    [services.googleAnalytics]
+        id = ""
 
 [params]
-  author = "株式会社インターワーク"
-  description = "AIに対応した高機能サイト構築サービス - 自動記事作成から、AIチャットボット、AI対応のチケットシステム"
-  
+    viewMorePostLink = "/blog/"
+    author = "株式会社インターワーク"
+    defaultKeywords = ["AI", "ウェブサイト", "サイト構築", "インターワーク"]
+    defaultDescription = "AI対応高機能サイト構築サービス"
+    
+    # Theme styling
+    style = "default"
+    disabled_logo = false
+    logo_text = "インターワーク"
+    
+    # Contact form
+    email = "info@interwork.co.jp"
+    contact_form_ajax = false
+    
+    # Features section
+    [params.features]
+        enable = true
+        title = "サービス特徴"
+        subtitle = "AI技術を活用した革新的なサイト構築"
+        cols = 3
+    
+    # Carousel section
+    [params.carouselHomepage]
+        enable = true
+        auto_play = true
+        slide_speed = 2000
+        pagination_speed = 1000
+
+    # Recent posts section
+    [params.recent_posts]
+        enable = true
+        title = "ブログ記事"
+        subtitle = "AI技術とサイト構築に関する最新情報"
+
+    # Testimonials section
+    [params.testimonials]
+        enable = true
+        title = "お客様の声"
+        subtitle = "当社のサービスをご利用いただいたお客様からの評価"
+
+    # See more section
+    [params.see_more]
+        enable = true
+        icon = "far fa-file-alt"
+        title = "詳細をご覧ください"
+        subtitle = "サイト構築サービスの詳細情報"
+        link_url = "/contact"
+        link_text = "お問い合わせ"
+
+    # Clients section
+    [params.clients]
+        enable = true
+        title = "パートナー企業"
+        subtitle = "信頼のパートナー企業との連携"
+
+# Menu configuration
 [[menu.main]]
-  name = "ホーム" 
-  url = "/"
-  weight = 1
+    name = "ホーム"
+    url = "/"
+    weight = 1
 
 [[menu.main]]
-  name = "ブログ"
-  url = "/blog/"
-  weight = 2
+    name = "ブログ"
+    url = "/blog/"
+    weight = 2
 
 [[menu.main]]
-  name = "お問い合わせ"
-  url = "/contact"
-  weight = 3
+    name = "お問い合わせ"
+    url = "/contact"
+    weight = 3
 
 [[menu.main]]
-  name = "サポートポータル"
-  url = "/faq"
-  weight = 4
-
-theme = "hugo-universal-theme"
+    name = "FAQ"
+    url = "/faq"
+    weight = 4
