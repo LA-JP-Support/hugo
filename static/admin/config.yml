@@ -1,7 +1,11 @@
+# 本番用：git-gateway（Netlify Identity経由）
 backend:
-  name: github
-  repo: LA-JP-Support/hugo
+  name: git-gateway
   branch: main
+
+# 開発用コメント（必要に応じて切り替え）
+# backend:
+#   name: test-repo
 
 media_folder: "static/images/uploads"
 public_folder: "/images/uploads"
