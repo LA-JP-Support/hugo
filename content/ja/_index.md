@@ -2,6 +2,7 @@
 title: Web構築サービス-株式会社インターワーク
 date: 2024-07-28
 layout: home
+description: 文章を追加した
 draft: false
 ---
 # Web構築サービス-株式会社インターワーク
