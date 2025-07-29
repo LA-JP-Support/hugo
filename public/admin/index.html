@@ -6,6 +6,9 @@
   <meta name="robots" content="noindex" />
   <title>コンテンツ管理 - 株式会社インターワーク</title>
   
+  <!-- Netlify Identity Widget - 最初に読み込み -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  
   <style>
     [data-slate-editor] {
       -webkit-user-modify: read-write !important;
@@ -13,7 +16,88 @@
   </style>
 </head>
 <body>
-  <!-- 安定版のDecap CMSを使用 -->
+  <!-- デバッグ情報表示 -->
+  <div id="debug-info" style="position: fixed; top: 10px; right: 10px; background: #f0f0f0; padding: 10px; font-size: 12px; z-index: 9999;">
+    <div>Identity Widget: <span id="identity-status">Loading...</span></div>
+    <div>CMS: <span id="cms-status">Loading...</span></div>
+  </div>
+  
   <script src="https://unpkg.com/decap-cms@3.0.0/dist/decap-cms.js"></script>
+  
+  <script>
+    // デバッグ情報更新
+    function updateStatus() {
+      document.getElementById('identity-status').textContent = window.netlifyIdentity ? '✅ Loaded' : '❌ Not loaded';
+      document.getElementById('cms-status').textContent = window.CMS ? '✅ Loaded' : '❌ Not loaded';
+    }
+    
+    // 初期状態
+    updateStatus();
+    
+    // Identity Widget 初期化確認
+    function initializeIdentity() {
+      if (window.netlifyIdentity) {
+        console.log('✅ Netlify Identity available');
+        updateStatus();
+        
+        // 認証成功時のハンドラー
+        window.netlifyIdentity.on('login', user => {
+          console.log('✅ User logged in:', user.email);
+          alert('ログイン成功！');
+          window.location.reload();
+        });
+        
+        window.netlifyIdentity.on('signup', user => {
+          console.log('✅ User signed up:', user.email);
+          alert('登録成功！');
+          window.location.reload();
+        });
+        
+        // 未認証ユーザー用の処理
+        window.netlifyIdentity.on("init", user => {
+          console.log('Identity initialized, user:', !!user);
+          if (!user) {
+            console.log('No user logged in - authentication required');
+          }
+        });
+        
+      } else {
+        console.log('❌ Netlify Identity not available, retrying...');
+        setTimeout(initializeIdentity, 1000);
+      }
+    }
+    
+    // Identity Widget 読み込み待機
+    setTimeout(initializeIdentity, 500);
+    
+    // 手動ログインボタン（デバッグ用）
+    setTimeout(() => {
+      if (window.netlifyIdentity) {
+        const loginBtn = document.createElement('button');
+        loginBtn.textContent = 'Manual Login';
+        loginBtn.style.position = 'fixed';
+        loginBtn.style.top = '60px';
+        loginBtn.style.right = '10px';
+        loginBtn.style.zIndex = '9999';
+        loginBtn.onclick = () => {
+          console.log('Opening login dialog...');
+          window.netlifyIdentity.open('login');
+        };
+        document.body.appendChild(loginBtn);
+        
+        const signupBtn = document.createElement('button');
+        signupBtn.textContent = 'Manual Signup';
+        signupBtn.style.position = 'fixed';
+        signupBtn.style.top = '90px';
+        signupBtn.style.right = '10px';
+        signupBtn.style.zIndex = '9999';
+        signupBtn.onclick = () => {
+          console.log('Opening signup dialog...');
+          window.netlifyIdentity.open('signup');
+        };
+        document.body.appendChild(signupBtn);
+      }
+    }, 3000);
+  </script>
 </body>
 </html>
