@@ -1,15 +1,22 @@
-# Root redirect to Japanese content
-[[redirects]]
-  from = "/"
-  to = "/ja/"
-  status = 302
+[build]
+  command = "hugo --cleanDestinationDir"
+  publish = "public"
 
-# Admin page headers
-[[headers]]
-  for = "/admin/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
+[build.environment]
+  HUGO_VERSION = "0.123.7"
+
+# Identity token handling - これが重要！
+[[redirects]]
+  from = "/ja/#*"
+  to = "/admin/#:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/#*"
+  to = "/admin/#:splat"
+  status = 200
+  force = true
 
 # Root redirect to Japanese content
 [[redirects]]

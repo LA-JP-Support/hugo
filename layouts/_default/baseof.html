@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="{{ or .Params.language .Site.Language.Lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} | {{ .Site.Title }}{{ end }}</title>
+    
+    <!-- Netlify Identity Widget - 重要！ -->
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    
+    {{ partial "head.html" . }}
+</head>
+<body{{ with .Params.body_classes }} class="{{ . }}"{{ end }}>
+    {{ partial "header.html" . }}
+    
+    <main>
+        {{ block "main" . }}{{ end }}
+    </main>
+    
+    {{ partial "footer.html" . }}
+    
+    <!-- Netlify Identity 初期化スクリプト -->
+    <script>
+        if (window.netlifyIdentity) {
+            window.netlifyIdentity.on("init", user => {
+                if (!user) {
+                    window.netlifyIdentity.on("login", () => {
+                        document.location.href = "/admin/";
+                    });
+                }
+            });
+            
+            // URL fragment から token を処理
+            const hash = window.location.hash;
+            if (hash.includes('invite_token') || hash.includes('confirmation_token') || hash.includes('recovery_token')) {
+                window.location.href = '/admin/' + hash;
+            }
+        }
+    </script>
+</body>
+</html>
