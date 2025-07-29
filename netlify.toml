@@ -1,0 +1,25 @@
+# Root redirect to Japanese content
+[[redirects]]
+  from = "/"
+  to = "/ja/"
+  status = 302
+
+# Admin page headers
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+
+# Root redirect to Japanese content
+[[redirects]]
+  from = "/"
+  to = "/ja/"
+  status = 302
+
+# Admin page headers
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"

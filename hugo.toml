@@ -1,7 +1,16 @@
-baseURL = 'https://hugo-intwk-u39205.vm.elestio.app'
+baseURL = 'https://inquisitive-toffee-b494e3.netlify.app'
 languageCode = 'ja-jp'
 title = 'Web構築サービス-株式会社インターワーク'
 defaultContentLanguage = "ja"
 defaultContentLanguageInSubdir = true
 theme = "hugo-boilerplate"
-assetDir = "assets"
+
+[languages]
+  [languages.ja]
+    title = "Web構築サービス-株式会社インターワーク"
+    weight = 1
+    languageName = "日本語"
+  [languages.en]
+    title = "Web Development Services - Interwork Co., Ltd."
+    weight = 2
+    languageName = "English"
