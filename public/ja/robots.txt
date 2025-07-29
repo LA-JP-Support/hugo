@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+
+
+Sitemap: https://hugo-intwk-u39205.vm.elestio.app/ja/sitemap.xml
+
+Sitemap: https://hugo-intwk-u39205.vm.elestio.app/en/sitemap.xml
+

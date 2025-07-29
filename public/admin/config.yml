@@ -1,0 +1,49 @@
+# Decap CMS Configuration for 株式会社インターワーク
+backend:
+  name: git-gateway
+  branch: main
+
+# ローカル開発用（本番では削除）
+local_backend: true
+
+# メディアファイルの設定
+media_folder: "static/images/uploads"
+public_folder: "/images/uploads"
+
+# サイト設定
+site_url: https://hugo-intwk-u39205.vm.elestio.app
+display_url: https://hugo-intwk-u39205.vm.elestio.app
+
+# 編集ワークフロー設定
+publish_mode: editorial_workflow
+show_preview_links: true
+
+# コレクション設定
+collections:
+  # 日本語ページ
+  - name: "pages_ja"
+    label: "ページ (日本語)"
+    folder: "content/ja"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "タイトル", name: "title", widget: "string" }
+      - { label: "説明", name: "description", widget: "text", required: false }
+      - { label: "公開日", name: "date", widget: "datetime" }
+      - { label: "下書き", name: "draft", widget: "boolean", default: false }
+      - { label: "重み", name: "weight", widget: "number", required: false }
+      - { label: "本文", name: "body", widget: "markdown" }
+
+  # 英語ページ
+  - name: "pages_en"
+    label: "Pages (English)"
+    folder: "content/en"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Description", name: "description", widget: "text", required: false }
+      - { label: "Date", name: "date", widget: "datetime" }
+      - { label: "Draft", name: "draft", widget: "boolean", default: false }
+      - { label: "Weight", name: "weight", widget: "number", required: false }
+      - { label: "Body", name: "body", widget: "markdown" }

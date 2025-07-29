@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url>
+    <loc>https://hugo-intwk-u39205.vm.elestio.app/</loc>
+    <lastmod>2024-07-28T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+  </url><url>
+    <loc>https://hugo-intwk-u39205.vm.elestio.app/author/</loc>
+    <changefreq>weekly</changefreq>
+  </url><url>
+    <loc>https://hugo-intwk-u39205.vm.elestio.app/categories/</loc>
+    <changefreq>weekly</changefreq>
+  </url><url>
+    <loc>https://hugo-intwk-u39205.vm.elestio.app/tags/</loc>
+    <changefreq>weekly</changefreq>
+  </url>
+</urlset>

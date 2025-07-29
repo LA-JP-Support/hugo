@@ -1,0 +1,7 @@
+baseURL = 'https://hugo-intwk-u39205.vm.elestio.app'
+languageCode = 'ja-jp'
+title = 'Web構築サービス-株式会社インターワーク'
+defaultContentLanguage = "ja"
+defaultContentLanguageInSubdir = true
+theme = "hugo-boilerplate"
+assetDir = "assets"

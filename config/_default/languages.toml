@@ -1,0 +1,19 @@
+[ja]
+  languageName = "日本語"
+  title = "Web構築サービス-株式会社インターワーク"
+  weight = 1
+  contentDir = "content/ja"
+  baseURL = "https://hugo-intwk-u39205.vm.elestio.app"
+  [ja.params]
+    bcp47Lang = "ja-jp"
+    description = "Web構築サービスを提供する株式会社インターワークのウェブサイト"
+
+[en]
+  languageName = "English"
+  title = "Web Development Services - Interwork Corporation"
+  weight = 2
+  contentDir = "content/en"
+  baseURL = "https://hugo-intwk-u39205.vm.elestio.app"
+  [en.params]
+    bcp47Lang = "en-us"
+    description = "Web development services by Interwork Corporation"

@@ -1,0 +1,9 @@
+nohup: ignoring input
+Watching for changes in /root/my-hugo-site/{archetypes,assets,content,data,i18n,layouts,package.json,postcss.config.js,static,tailwind.config.js,themes}
+Watching for config changes in /root/my-hugo-site/hugo.toml, /root/my-hugo-site/config/_default
+Start building sites … 
+hugo v0.123.7+extended linux/amd64 BuildDate=2025-07-18T03:41:49Z VendorInfo=ubuntu:0.123.7-1ubuntu0.3
+
+ERROR render of "section" failed: "/root/my-hugo-site/themes/hugo-boilerplate/layouts/_default/design-system.html:57:11": execute of template failed: template: _default/design-system.html:57:11: executing "main" at <partial "design-system/icons.html" .>: error calling partial: "/root/my-hugo-site/themes/hugo-boilerplate/layouts/partials/design-system/icons.html:33:17": execute of template failed: template: partials/design-system/icons.html:33:17: executing "partials/design-system/icons.html" at <readDir $iconsDir>: error calling readDir: failed to read directory "themes/boilerplate/layouts/partials/icons/": open /root/my-hugo-site/themes/boilerplate/layouts/partials/icons: no such file or directory
+Built in 318 ms
+Error: error building site: render: failed to render pages: render of "section" failed: "/root/my-hugo-site/themes/hugo-boilerplate/layouts/_default/list.html:16:11": execute of template failed: template: _default/list.html:16:11: executing "main" at <partial "components/cards/post_card_with_image.html" (dict "page" . "cardHeight" 540)>: error calling partial: "/root/my-hugo-site/themes/hugo-boilerplate/layouts/partials/components/cards/post_card_with_image.html:42:77": execute of template failed: template: partials/components/cards/post_card_with_image.html:42:77: executing "partials/components/cards/post_card_with_image.html" at <$page.Params.youtubeVideoID>: invalid value; expected bool
