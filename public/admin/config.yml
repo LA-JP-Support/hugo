@@ -1,17 +1,36 @@
+# 本番用：git-gateway（Netlify Identity経由）
 backend:
-  name: test-repo
+  name: git-gateway
+  branch: main
+
+# 開発用コメント（必要に応じて切り替え）
+# backend:
+#   name: test-repo
 
 media_folder: "static/images/uploads"
 public_folder: "/images/uploads"
 
 collections:
-  - name: "pages"
-    label: "ページ"
+  - name: "pages_ja"
+    label: "ページ (日本語)"
     folder: "content/ja"
     create: true
     slug: "{{slug}}"
     fields:
       - { label: "タイトル", name: "title", widget: "string" }
-      - { label: "日付", name: "date", widget: "datetime" }
+      - { label: "説明", name: "description", widget: "text", required: false }
+      - { label: "公開日", name: "date", widget: "datetime" }
       - { label: "下書き", name: "draft", widget: "boolean", default: false }
       - { label: "本文", name: "body", widget: "markdown" }
+
+  - name: "pages_en"
+    label: "Pages (English)"
+    folder: "content/en"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Description", name: "description", widget: "text", required: false }
+      - { label: "Date", name: "date", widget: "datetime" }
+      - { label: "Draft", name: "draft", widget: "boolean", default: false }
+      - { label: "Body", name: "body", widget: "markdown" }
