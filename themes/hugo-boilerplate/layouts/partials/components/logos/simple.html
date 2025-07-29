@@ -1,0 +1,108 @@
+{{/*
+@component: Simple Logos
+@description: Displays a simple grid of client/partner logos.
+@params:
+  - theme: "light" (default) or "dark" — adds class="dark" for section
+  - heading: Section heading text (optional)
+  - description: Section description text (optional)
+  - logos: Can be one of:
+      1. Array of logo objects directly (from inner content)
+      2. String reference to front matter section containing logo array
+    Each logo object should have:
+    - name: Company/brand name
+    - image: URL to the logo image
+    - url: Link to company homepage (optional)
+@example:
+  {{ partial "components/logos/simple.html" (dict 
+      "theme" "dark"
+      "heading" "Our Trusted Partners"
+      "description" "We work with these amazing companies to deliver value"
+      "logos" (slice
+        (dict
+          "name" "Company A" 
+          "image" "/images/logos/company-a.svg"
+          "url" "https://example-a.com"
+        )
+        (dict 
+          "name" "Company B" 
+          "image" "/images/logos/company-b.svg"
+        )
+      )
+  ) }}
+@note: The component will use default partner logos if none are provided, making it easy to implement in development.
+*/}}
+
+{{/* Theme setup */}}
+{{ $theme := .theme | default "light" }}
+{{ $isDark := eq $theme "dark" }}
+{{ $darkClass := cond $isDark "dark" "" }}
+
+{{/* Logo alignment setup */}}
+{{ $alignment := .alignment | default "responsive" }}
+{{ $justifyClass := cond (eq $alignment "center") "justify-center" "justify-center lg:justify-between" }}
+
+{{/* Logos */}}
+{{ $defaultLogos := slice 
+  (dict
+    "name" "PostAffiliatePro"
+    "image" "/images/logos/pap-logo_v2.svg"
+    "url" "https://www.postaffiliatepro.com/"
+  )
+  (dict
+    "name" "KPMG"
+    "image" "/images/logos/kpmg_logo_v2.svg"
+    "url" "https://kpmg.com/sk/sk/home.html"
+  )
+  (dict
+    "name" "LiveAgent"
+    "image" "/images/logos/liveagent_logo_v2.svg"
+    "url" "https://www.liveagent.com/"
+  )
+  (dict
+    "name" "HZ-Containers"
+    "image" "/images/logos/hz_logo_v2.svg"
+    "url" "https://www.hz-containers.com/"
+  )
+  (dict
+    "name" "VGD"
+    "image" "/images/logos/vgd_logo_v2.svg"
+    "url" "https://be.vgd.eu/en/services/audit"
+  )
+}}
+{{ $logos := .logos | default $defaultLogos }}
+
+{{ if $logos }}
+  {{/* Heading and Description */}}
+  {{ $heading := .heading }}
+  {{ $description := .description | default "" }}
+
+  <div class="{{ $darkClass }}">
+    <div class="section-bg-light dark:section-bg-dark dark:my-12 dark:lg:mb-24 py-12 lg:py-16">
+      <div class="wrapper">
+        {{ if or $heading $description }}
+        <div class="text-center mb-8 sm:mb-12 {{ if $heading }}pt-4{{ end }}">
+          {{ if $heading }}<h2 class="text-heading text-3xl font-bold tracking-tight sm:text-4xl">{{ $heading }}</h2>{{ end }}
+          {{ if $description }}<p class="mt-4 text-lg text-body">{{ $description | markdownify }}</p>{{ end }}
+        </div>
+        {{ end }}
+
+        <div class="mx-auto flex flex-wrap {{ $justifyClass }} items-center gap-8 sm:gap-12 md:gap-16">
+          {{ range $index, $logo := $logos }}
+            <div class="flex items-center justify-center">
+              {{ $class := "block max-h-12 h-10 lg:h-12 w-full object-contain" }}
+              {{ if $logo.url }}<a href="{{ $logo.url }}" target="_blank" rel="noopener noreferrer" title="{{ $logo.name }}">{{ end }}
+                  {{ partial "components/media/lazyimg.html" (dict
+                    "src" $logo.image
+                    "alt" $logo.name
+                    "class" $class
+                    "loading" "lazy"
+                    "decoding" "async"
+                  ) }}
+              {{ if $logo.url }}</a>{{ end }}
+            </div>
+          {{ end }}
+        </div>
+      </div>
+    </div>
+  </div>
+{{ end }}

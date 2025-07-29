@@ -1,0 +1,70 @@
+{{/* Simple Logos Shortcode */}}
+{{- /*
+  Usage in markdown:
+
+  1. Simple usage (will use default logos):
+  {{< logos-simple 
+    theme="dark"
+    heading="Our Partners"
+    description="We work with these amazing companies"
+     
+  >}}
+
+  2. With custom JSON logos data:
+  {{< logos-simple 
+    theme="dark"
+    heading="Our Partners"
+    description="We work with these amazing companies"
+     
+  >}}
+  [
+    {
+      "name": "Company Name",
+      "image": "/images/logos/company-logo.svg",
+      "url": "https://company-website.com",
+      "height": 18
+    },
+    {
+      "name": "Another Company",
+      "image": "/images/logos/another-logo.svg",
+      "height": 12
+    }
+  ]
+  {{< /logos-simple >}}
+
+  Parameters:
+    - theme: "light" (default) or "dark" — adds class="dark" for section
+    - heading: Optional heading text (default: "")
+    - description: Optional description text (default: "")
+    
+Note: This component always uses default partner logos defined in the partial if no JSON data is provided.
+
+*/ -}}
+
+{{ $theme := .Get "theme" | default "light" }}
+{{ $heading := .Get "heading" | default "" }}
+{{ $description := .Get "description" | default "" }}
+
+{{ $params := dict 
+  "theme" $theme
+  "heading" $heading
+  "description" $description
+}}
+
+{{ $logos := slice }}
+
+{{/* Try to get logos from inner content if it exists and is valid JSON */}}
+{{ with .Inner }}
+  {{ if . }}
+    {{ $trimmedInner := trim . " \n\r\t" }}
+    {{ if and (hasPrefix $trimmedInner "[") (hasSuffix $trimmedInner "]") }}
+      {{ $logos = . | unmarshal }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+
+{{ if $logos }}
+  {{ $params = merge $params (dict "logos" $logos) }}
+{{ end }}
+
+{{ partial "components/logos/simple.html" $params }}

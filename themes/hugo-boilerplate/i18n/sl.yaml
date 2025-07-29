@@ -1,0 +1,105 @@
+# English translations
+frequently_asked_questions: "Pogosta vprašanja"
+language_selector_title: "Razpoložljivi jeziki"
+glossary_subtitle: "Izčrpen seznam izrazov in definicij"
+glossary_title: "Slovar"
+home_title: "Domov"
+
+# Search translations
+search_placeholder: "Iskanje..."
+search_submit_aria: "Pošlji iskanje"
+search_clear_aria: "Počisti iskanje"
+search_clear_title: "Počisti iskanje"
+search_loading: "Nalaganje..."
+search_view_all_results: "Prikaži vse rezultate"
+search_no_results: "Ni najdenih rezultatov."
+search_error_loading: "Napaka pri nalaganju rezultatov iskanja."
+search_error_performing: "Napaka pri izvajanju iskanja."
+search_not_available: "Funkcija iskanja ni na voljo. Poskusite znova pozneje."
+search_initializing: "Iskanje se še vedno inicializira. Poskusite znova."
+search_no_content_preview: "Predogled vsebine ni na voljo"
+search_untitled: "Brez naslova"
+
+# Glossary translations
+glossary_eyebrow: "Glosar"
+
+# Category page translations
+categories_title: "Kategorije"
+categories_browse_all: "Prebrskaj vso vsebino po kategorijah"
+category_eyebrow: "Kategorija"
+category_browse_content: "Prebrskaj vso vsebino v kategoriji %s"
+category_no_content_found: "V tej kategoriji ni najdene vsebine"
+category_try_browsing: "Poskusite prebrskati druge kategorije ali poiskati vsebino"
+category_other_categories: "Druge kategorije"
+
+# CTA translations
+cta_default_heading: "Razširite svoje znanje z našimi viri"
+cta_default_description: "Raziščite našo obsežno knjižnico člankov, vodičev in vadnic, da poglobite svoje razumevanje ključnih konceptov in ostanete na tekočem z najnovejšimi razvojnimi dosežki."
+cta_default_primary_text: "Prebrskaj vire"
+cta_default_secondary_text: "Kontaktirajte naše strokovnjake"
+
+# Content type translations
+content_article_singular: "članek"
+content_article_plural: "članki"
+
+# Tags page translations
+tags_title: "Oznake"
+tags_browse_all: "Prebrskaj vso vsebino po temah"
+tag_eyebrow: "Oznaka"
+tag_browse_content: "Prebrskaj vsebine z oznako %s"
+tag_no_content_found: "Ni vsebine s to oznako"
+tag_try_browsing: "Poskusite prebrskati druge oznake ali poiskati vsebino"
+tag_pagination_page: "%d / %d (%d)"
+tag_pagination_previous: "Nazaj"
+tag_pagination_next: "Naprej"
+tag_other_tags: "Druge oznake"
+tag_show_less: "Prikaži manj"
+# Cookie consent translations
+cookie_consent_title: "Soglasje za piškotke"
+cookie_consent_message: "Uporabljamo piškotke za izboljšanje vaše izkušnje brskanja in analiziranje našega prometa."
+cookie_consent_accept_all: "Sprejmi vse"
+cookie_consent_accept_necessary: "Sprejmi samo nujne"
+cookie_consent_settings: "Nastavitve piškotkov"
+cookie_settings_title: "Nastavitve piškotkov"
+cookie_settings_close: "Zapri"
+cookie_settings_necessary_title: "Nujni piškotki"
+cookie_settings_necessary_description: "Ti piškotki so potrebni za delovanje spletne strani in jih ni mogoče onemogočiti."
+cookie_settings_analytics_title: "Analitični piškotki"
+cookie_settings_analytics_description: "Ti piškotki nam pomagajo razumeti, kako obiskovalci uporabljajo našo spletno stran."
+cookie_settings_cancel: "Prekliči"
+cookie_settings_save: "Shrani nastavitve"
+
+# Pagination translations
+pagination_previous: "Nazaj"
+pagination_next: "Naprej"
+pagination_showing: "Prikazano"
+pagination_to: "do"
+pagination_of: "od"
+pagination_results: "rezultatov"
+pagination_browse_all: "Prebrskaj vso vsebino v"
+
+# FAQ translations
+faq_heading: "Pogosto zastavljena vprašanja"
+faq_description: "Poiščite odgovore na pogosta vprašanja o tej temi."
+
+no_terms_available: "Ni razpoložljivih pojmov"
+pricing_monthly_label: "Mesečno"
+pricing_yearly_label: "Letno"
+wantMore: "Želite več?"
+learnMore: "Več informacij"
+pricing_tagline: "Cenik"
+pricing_title: "Cenik, ki raste z vami"
+pricing_description: "Izberite cenovno ugoden paket, ki je napolnjen z najboljšimi funkcijami za pritegnitev občinstva, ustvarjanje zvestobe strank in povečanje prodaje."
+pricing_comparison_title: "Primerjava paketov"
+pricing_comparison_description: "Oglejte si primerjave naših paketov in izberite najboljšega za vas"
+read_more_post: "Preberi več"
+no_posts_found: "Nobenih objav ni bilo najdenih"
+minutes_read: "min branja"
+get_started: "Začni"
+courses.session: "Seja"
+courses.you_will_learn: "Naučili se boste:"
+courses.or: "ali"
+courses.format: "Format"
+
+# Icon card translations
+icon.card.btn: "Poglej"

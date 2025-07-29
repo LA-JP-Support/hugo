@@ -1,0 +1,34 @@
+{{ define "main" }}
+
+{{ partial "breadcrumbs_default.html" . }}
+{{ partial "hero_default.html" . }}
+
+<!-- Main Content -->
+<div class="bg-white">
+  <div class="wrapper">
+    <div class="mx-auto max-w-none prose prose-lg prose-img:rounded-xl">
+      {{ .Content | partial "utils/linkbuilding" (dict "content" .Content "page" .) | safeHTML }}
+    </div>
+  </div>
+</div>
+
+<!-- FAQ Section if available -->
+{{ if .Params.faq }}
+{{ partial "sections/faq/side-by-side" (dict
+"title" (i18n "faq_heading")
+"description" (i18n "faq_description")
+"items" .Params.faq
+) }}
+{{ end }}
+
+
+<!-- Author Section -->
+{{ if .Params.author }}
+  {{ partial "author.html" (dict "authorKey" .Params.author "page" .) }}
+{{ end }}
+
+{{ partial "cta.html" . }}
+
+{{ partial "related_content.html" . }}
+
+{{ end }}

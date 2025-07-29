@@ -1,0 +1,128 @@
+{{/*
+@section: Three Column Bento Grid
+@description: A visually appealing layout featuring multiple content cards of varying sizes arranged in a three-column grid pattern, ideal for showcasing features or product highlights.
+@params:
+  - theme: "light" or "dark" (default: "light") — applies dark mode styles if set to "dark"
+  - tagline: Short text displayed above the main heading (optional, default: empty)
+  - heading: Main section heading (optional, default: empty)
+  - description: Short description text below the heading (optional, default: empty)
+  - cards: Array of card objects with content (supports unlimited cards)
+    - title: Card title text (optional)
+    - description: Card description text (optional)
+    - image: URL to image (required)
+    - imageAlt: Alt text for the image (optional)
+    - imagePosition: Position of the image in the card, "top" or "bottom" (optional, default: "top")
+    - url: URL to link the card to, making the entire card clickable (optional)
+    - linkText: Text to display as a link at the bottom of the card (optional)
+@example:
+  {{ partial "sections/bentogrids/three_column_bento_grid.html" (dict 
+      "theme" "light"
+      "tagline" "Features" 
+      "heading" "Everything you need to build your application"
+      "cards" (slice
+          (dict
+              "title" "Responsive Design" 
+              "description" "Our platform automatically adapts to any device or screen size."
+              "image" "/images/features/responsive.png"
+              "imageAlt" "Responsive design illustration"
+          )
+          (dict
+              "title" "Analytics" 
+              "description" "Detailed insights into your user behavior and application performance."
+              "image" "/images/features/analytics.png"
+              "imageAlt" "Analytics dashboard"
+          )
+          (dict
+              "title" "Security" 
+              "description" "Enterprise-grade security with end-to-end encryption."
+              "image" "/images/features/security.png"
+              "imageAlt" "Security shield"
+          )
+          (dict
+              "image" "/images/features/more-features.png"
+              "imageAlt" "Additional feature"
+          )
+      )
+  ) }}
+@note: This section uses a dynamic bento grid layout with cards of varying sizes to create visual interest. The layout automatically adapts to any number of cards provided. Every third card (0, 3, 6...) will span 2 rows to create visual interest. Card heights are dynamically calculated based on their content.
+*/}}
+
+{{/* Three Column Bento Grid Section */}}
+{{ $tagline := .tagline | default "" }}
+{{ $heading := .heading | default "" }}
+{{ $description := .description | default "" }}
+
+{{/* Parse inner content as JSON if provided */}}
+{{ $cards := (slice) }}
+{{ with .Inner }}
+  {{ if . }}
+    {{ $cards = . | unmarshal }}
+  {{ end }}
+{{ end }}
+
+{{/* Theme setup */}}
+{{ $theme := .theme | default "light" }}
+{{ $isDark := eq $theme "dark" }}
+{{ $darkClass := cond $isDark "dark" "" }}
+
+{{ $cards := .cards | default (slice) }}
+
+<div class="{{ $darkClass }}">
+  <div class="section-bg-light dark:section-bg-dark py-24 sm:py-32">
+    <div class="wrapper">
+      {{ if $tagline }}
+        <h2 class="text-center text-base/7 font-semibold product-text">{{ $tagline }}</h2>
+      {{ end }}
+      {{ if $heading }}
+        <p class="{{ if $tagline }}mt-2{{ end }} text-center text-4xl font-semibold tracking-tight text-balance text-heading sm:text-5xl">{{ $heading }}</p>
+      {{ end }}
+      {{ if $description }}
+        <p class="mt-6 mx-auto max-w-2xl text-center text-lg/9 text-body">{{ $description }}</p>
+      {{ end }}
+      <div class="mt-20 grid gap-8 lg:gap-16 md:grid-cols-3">
+        {{ range $index, $card := $cards }}
+        {{ $imagePosition := $card.imagePosition | default "top" }}
+        <div class="relative">
+          <div class="absolute inset-px rounded-2xl border surface-secondary surface-border shadow-lg"></div>
+              <div class="relative flex flex-col overflow-hidden">
+                {{ if and $card.image (eq $imagePosition "top") }}
+                  <div class="flex items-center justify-center">
+                    {{ partial "components/media/lazyimg.html" (dict "src" $card.image "alt" ($card.imageAlt | default "")) }}
+                  </div>
+                {{ end }}
+                
+                <div class="p-4 lg:p-8">
+                  {{ if $card.title }}
+                    <p class="text-base/8 font-medium tracking-tight text-heading max-md:text-center">{{ $card.title }}</p>
+                  {{ end }}
+
+                {{ if $card.description }}
+                  <p class="max-w-lg text-sm/8 text-body max-md:text-center">{{ $card.description }}</p>
+                {{ end }}
+
+                {{ if $card.url }}
+                  <div class="mt-5 flex items-center justify-center md:justify-start">
+                    {{ partial "components/buttons/buttons.html" (dict
+                        "text" $card.linkText
+                        "url" ($card.url)
+                        "variant" "secondary"
+                        "showArrow" false
+                    ) }}
+                  </div>
+                {{ end }}
+              </div>
+
+              {{ if and $card.image (eq $imagePosition "bottom") }}
+                <div class="flex items-center justify-center px-8 sm:px-10 pb-8 pt-2">
+                  {{ partial "components/media/lazyimg.html" (dict "src" $card.image "alt" ($card.imageAlt | default "") ) }}
+                </div>
+              {{ else if not $card.image }}
+                <div class="pb-6"></div> <!-- Empty space at bottom if no link and no image -->
+              {{ end }}
+            </div>
+          </div>
+        {{ end }}
+      </div>
+    </div>
+  </div>
+</div>

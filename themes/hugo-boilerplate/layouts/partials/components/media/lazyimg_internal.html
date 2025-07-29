@@ -1,0 +1,348 @@
+{{/*
+@component: Lazy Image
+@description: Displays images with lazy-loading and automatic WebP support, responsive sizes, and optimization for different screens.
+@params:
+  - src: Path to the source image (required)
+  - alt: Alternative text for accessibility (required)
+  - class: Additional CSS classes (optional)
+  - id: Image ID (optional)
+  - width: Image width (optional)
+  - height: Image height (optional)
+  - maxWidth: Maximum image width for loading (optional)
+  - noLazy: Set to true to disable lazy loading (for hero images, above-the-fold content) (optional)
+@example:
+  {{ partial "components/media/lazyimg.html" (dict
+      "src" "/images/blog/featured-image.jpg"
+      "alt" "Featured blog image"
+      "class" "rounded-lg shadow-md"
+      "maxWidth" 800
+  ) }}
+@note: The component automatically looks for preprocessed image versions in the /images/processed/ directory, maintaining the original directory structure.
+*/}}
+
+{{ $src := .src }}
+{{ $alt := .alt | default "" }}
+{{ $class := .class | default "" }}
+{{ $classPicture := .classPicture | default "" }}
+{{ $id := .id | default "" }}
+{{ $width := .width | default "" }}
+{{ $height := .height | default "" }}
+{{ $maxWidth := .maxWidth | default 3000 }}
+{{ $noLazy := .noLazy | default false }}
+
+{{ if or (strings.HasSuffix $src ".svg") (strings.HasSuffix $src ".SVG") }}
+  <!-- SVGs: skip <picture> and srcset logic, just use <img> with lazy loading -->
+  {{ $imgClassSvg := "lazy-image" }}
+  {{ if $class }}{{ $imgClassSvg = printf "%s %s" $imgClassSvg $class }}{{ end }}
+  <img
+    {{ if $noLazy }}
+    src="{{ $src }}"
+    class="{{ $imgClassSvg }} loaded"
+    {{ else }}
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" {{/* Placeholder for linters */}}
+    class="{{ $imgClassSvg }}"
+    data-src="{{ $src }}"
+    {{ end }}
+    alt="{{ $alt }}"{{ if $id }}
+    id="{{ $id }}"{{ end }}{{ if $width }}
+    width="{{ $width }}"{{ end }}{{ if $height }}
+    height="{{ $height }}"{{ end }}
+    {{ if not $noLazy }}loading="lazy"{{ end }}
+    decoding="async"
+    data-original-src="{{ $src }}"
+  >
+{{ else }}
+
+    {{ $availableWidths := slice 300 768 1024 }}
+
+    <!-- Extract paths for processed images -->
+    {{ $filename := path.Base $src }}
+    {{ $extension := path.Ext $filename }}
+    {{ $basename := replace $filename $extension "" }}
+    {{ $dirPath := path.Dir $src }}
+
+    <!-- Extract the relative path inside /images/ directory -->
+    {{ $relativePath := $dirPath }}
+    {{ if hasPrefix $dirPath "/images/" }}
+      {{ $relativePath = substr $dirPath 8 }}
+    {{ end }}
+
+    <!-- Create processed directory path that mirrors original structure -->
+    {{ $processedDirPath := path.Join "/images/processed" $relativePath }}
+    {{ if not (eq $processedDirPath "/images/processed") }}
+      {{ $processedDirPath = printf "%s/" $processedDirPath }}
+    {{ else }}
+      {{ $processedDirPath = "/images/processed/" }}
+    {{ end }}
+
+    <!-- Initialize variables -->
+    {{ $useOriginal := false }}
+
+    <!-- 1 & 2. Get original image dimensions -->
+    {{ $originalImagePath := printf "static%s" $src }}
+    {{ $originalWidth := 0 }}
+
+    <!-- Check file extension before using imageConfig -->
+    {{ $fileExtLower := strings.ToLower (path.Ext $src) }}
+    {{ if fileExists $originalImagePath }}
+      {{ if eq $fileExtLower ".avif" }}
+        <!-- Skip imageConfig for AVIF files as Hugo doesn't support them -->
+        {{ $originalWidth = 1500 }} <!-- Default width for AVIF files -->
+      {{ else }}
+        <!-- Use imageConfig for supported formats -->
+        {{ with (imageConfig $originalImagePath) }}
+          {{ $originalWidth = .Width }}
+        {{ end }}
+      {{ end }}
+    {{ end }}
+
+    <!-- Add the original width to availableWidths if maxWidth is larger than original width -->
+    {{ if and (gt $maxWidth 0) (gt $maxWidth $originalWidth) (gt $originalWidth 0) }}
+      {{ $foundOriginal := false }}
+      {{ range $availableWidths }}
+        {{ if eq . $originalWidth }}
+          {{ $foundOriginal = true }}
+        {{ end }}
+      {{ end }}
+      {{ if not $foundOriginal }}
+        {{ $availableWidths = $availableWidths | append $originalWidth }}
+      {{ end }}
+    {{ end }}
+
+    <!-- 3. Validate if processed image exists for each size and keep only those that do -->
+    {{ $validatedWidths := slice }}
+    {{ range $availableWidths }}
+      {{ $w := . }} {{/* Renamed to avoid conflict with partial's $width */}}
+      {{ $processedPath := printf "%s%s-%d%s" $processedDirPath $basename $w $extension }}
+      {{ if fileExists (printf "static%s" $processedPath) }}
+        {{ $validatedWidths = $validatedWidths | append $w }}
+      {{ end }}
+    {{ end }}
+    {{ $availableWidths = $validatedWidths }}
+
+    <!-- 4. If maxWidth is defined, remove from the list all images bigger than one step above maxWidth -->
+    {{ if gt $maxWidth 0 }}
+      <!-- Find the next size up from maxWidth -->
+      {{ $nextSize := 0 }}
+      {{ $sortedForNext := sort $availableWidths }}
+      {{ range $sortedForNext }}
+        {{ if gt . $maxWidth }}
+          {{ $nextSize = . }}
+          {{ break }}
+        {{ end }}
+      {{ end }}
+
+      <!-- Filter the list to keep only up to the next size -->
+      {{ if gt $nextSize 0 }}
+        {{ $filteredByMax := slice }}
+        {{ range $availableWidths }}
+          {{ if le . $nextSize }}
+            {{ $filteredByMax = $filteredByMax | append . }}
+          {{ end }}
+        {{ end }}
+        {{ $availableWidths = $filteredByMax }}
+      {{ end }}
+    {{ end }}
+
+    <!-- Add original image to srcset if maxWidth is larger than original width -->
+    {{ if and (gt $maxWidth 0) (gt $maxWidth $originalWidth) (gt $originalWidth 0) }}
+      <!-- Always include original image regardless of processed images -->
+      {{ $useOriginal = true }}
+    {{ end }}
+
+    <!-- If no processed images found, or we need to use original image -->
+    {{ if or (eq (len $availableWidths) 0) $useOriginal }}
+      {{ $useOriginal = true }}
+      <!-- Use original width if known, or a default width -->
+      {{ if gt $originalWidth 0 }}
+        <!-- Make sure originalWidth is in the availableWidths array -->
+        {{ $foundOriginal := false }}
+        {{ range $availableWidths }}
+          {{ if eq . $originalWidth }}
+            {{ $foundOriginal = true }}
+          {{ end }}
+        {{ end }}
+        {{ if not $foundOriginal }}
+          {{ $availableWidths = $availableWidths | append $originalWidth }}
+        {{ end }}
+      {{ else }}
+        <!-- Default fallback if we can\'t determine original width -->
+        {{ $availableWidths = slice 1024 }}
+      {{ end }}
+    {{ end }}
+
+    {{/* Adjust $availableWidths for the sizes attribute considering $maxWidth from partial context */}}
+    {{ $processedWidthsForSizes := $availableWidths }}
+    {{ $paramMaxWidthVal := $maxWidth }} {{/* Use $maxWidth from partial context */}}
+    {{ if $paramMaxWidthVal }}
+      {{ $maxWidthInt := int $paramMaxWidthVal }}
+      {{ $tempFilteredWidths := slice }}
+      {{ range $processedWidthsForSizes }}
+        {{ if le . $maxWidthInt }}
+          {{ $tempFilteredWidths = $tempFilteredWidths | append . }}
+        {{ end }}
+      {{ end }}
+      {{ $processedWidthsForSizes = $tempFilteredWidths | append $maxWidthInt | uniq | sort }}
+    {{ else }}
+      {{ $processedWidthsForSizes = $processedWidthsForSizes | uniq | sort }}
+    {{ end }}
+
+    <!-- Generate dynamic sizes attribute based on available widths -->
+    {{ $sizesAttr := "" }}
+    {{ $sortedWidths := $processedWidthsForSizes }}
+    {{ $numWidths := len $sortedWidths }}
+
+    {{ $largestWidth := 0 }}
+    {{ if gt $numWidths 0 }}
+        {{ $largestWidth = index $sortedWidths (sub $numWidths 1) }}
+    {{ end }}
+
+    {{ $sizesAttr = "" }}
+    {{ range $i, $w := $sortedWidths }} {{/* Renamed to avoid conflict */}}
+        {{ if lt $w $largestWidth }}
+            {{ if $sizesAttr }}
+                {{ $sizesAttr = printf "%s, " $sizesAttr }}
+            {{ end }}
+            {{ $sizesAttr = printf "%s(max-width: %dpx) %dpx" $sizesAttr $w $w }}
+        {{ end }}
+    {{ end }}
+
+    {{ if $sizesAttr }}
+        {{ $sizesAttr = printf "%s, %dpx" $sizesAttr $largestWidth }}
+    {{ else }}
+        {{ $sizesAttr = printf "%dpx" $largestWidth }}
+    {{ end }}
+
+    {{ $fallbackSrc := $src }}
+    {{ $optimizedOriginalPath := printf "%s%s%s" $processedDirPath $basename $extension }}
+    {{ $hasOptimizedOriginal := fileExists (printf "static%s" $optimizedOriginalPath) }}
+
+    {{ if $hasOptimizedOriginal }}
+      {{ $fallbackSrc = $optimizedOriginalPath }}
+    {{ end }}
+
+    {{ $origSrcset := "" }}
+    {{ $webpSrcset := "" }}
+
+    {{ $originalWebpPath := printf "%s%s.webp" $processedDirPath $basename }}
+    {{ $useOriginalWebp := fileExists (printf "static%s" $originalWebpPath) }}
+
+    {{ $availableSrcWidths := slice }}
+    {{ $availableWebpWidths := slice }}
+
+    {{ range $availableWidths }}
+        {{ $currentWidth := . }}
+        {{ $currentSrcPath := printf "%s%s-%d%s" $processedDirPath $basename $currentWidth $extension }}
+        {{ $currentWebpPath := printf "%s%s-%d.webp" $processedDirPath $basename $currentWidth }}
+
+        {{ if fileExists (printf "static%s" $currentSrcPath) }}
+            {{ $availableSrcWidths = $availableSrcWidths | append (dict "width" $currentWidth "path" $currentSrcPath) }}
+        {{ end }}
+
+        {{ if fileExists (printf "static%s" $currentWebpPath) }}
+            {{ $availableWebpWidths = $availableWebpWidths | append (dict "width" $currentWidth "path" $currentWebpPath) }}
+        {{ end }}
+    {{ end }}
+
+    {{ if and $hasOptimizedOriginal $useOriginal }}
+      {{ $availableSrcWidths = $availableSrcWidths | append (dict "width" $originalWidth "path" $optimizedOriginalPath) }}
+    {{ end }}
+
+    {{ if $useOriginalWebp }}
+      {{ $foundOriginalWebp := false }}
+      {{ range $availableWebpWidths }}
+        {{ if eq .path $originalWebpPath }}
+          {{ $foundOriginalWebp = true }}
+        {{ end }}
+      {{ end }}
+      {{ if not $foundOriginalWebp }}
+        {{ $availableWebpWidths = $availableWebpWidths | append (dict "width" $originalWidth "path" $originalWebpPath) }}
+      {{ end }}
+    {{ end }}
+
+    {{ $availableSrcWidths = sort $availableSrcWidths "width" "asc" }}
+    {{ $availableWebpWidths = sort $availableWebpWidths "width" "asc" }}
+
+    {{ range $availableSrcWidths }}
+      {{ if $origSrcset }}
+        {{ $origSrcset = printf "%s, %s %dw" $origSrcset .path .width }}
+      {{ else }}
+        {{ $origSrcset = printf "%s %dw" .path .width }}
+      {{ end }}
+    {{ end }}
+
+    {{ range $availableWebpWidths }}
+      {{ if $webpSrcset }}
+        {{ $webpSrcset = printf "%s, %s %dw" $webpSrcset .path .width }}
+      {{ else }}
+        {{ $webpSrcset = printf "%s %dw" .path .width }}
+      {{ end }}
+    {{ end }}
+
+    {{ if and (not $webpSrcset) $useOriginalWebp }}
+      {{ $webpSrcset = printf "%s %dw" $originalWebpPath $originalWidth }}
+    {{ end }}
+
+    {{ if not $origSrcset }}
+      {{ $origSrcset = printf "%s %dw" $fallbackSrc $originalWidth }}
+    {{ end }}
+
+    {{ $fileExt := strings.ToLower (path.Ext $src) }}
+    {{ $mimeType := "image/octet-stream" }}
+    {{ if eq $fileExt ".jpeg" }}{{ $mimeType = "image/jpeg" }}
+    {{ else if eq $fileExt ".jpg" }}{{ $mimeType = "image/jpeg" }}
+    {{ else if eq $fileExt ".png" }}{{ $mimeType = "image/png" }}
+    {{ else if eq $fileExt ".webp" }}{{ $mimeType = "image/webp" }}
+    {{ else if eq $fileExt ".gif" }}{{ $mimeType = "image/gif" }}
+    {{ else if eq $fileExt ".avif" }}{{ $mimeType = "image/avif" }}
+    {{ end }}
+
+    {{ $pictureFinalClass := "lazy-picture" }}
+    {{ if $classPicture }}{{ $pictureFinalClass = printf "%s %s" $pictureFinalClass $classPicture }}{{ end }}
+    {{ if $noLazy }}{{ $pictureFinalClass = printf "%s %s" $pictureFinalClass "loaded" }}{{ end }}
+    <picture
+      class="{{ $pictureFinalClass }}"{{ if $maxWidth }}
+      data-maxWidth="{{ $maxWidth }}"{{ end }}
+    >
+      {{ if and $webpSrcset (ne $fileExt ".webp") }}
+      <source
+        type="image/webp"
+        {{ if $noLazy }}
+        srcset="{{ $webpSrcset }}"
+        {{ else }}
+        data-srcset="{{ $webpSrcset }}"
+        {{ end }}
+        sizes="{{ $sizesAttr }}"
+        data-original-src="{{ $src }}"
+      >
+      {{ end }}
+      <source
+        type="{{ $mimeType }}"
+        {{ if $noLazy }}
+        srcset="{{ $origSrcset }}"
+        {{ else }}
+        data-srcset="{{ $origSrcset }}"
+        {{ end }}
+        sizes="{{ $sizesAttr }}"
+        data-original-src="{{ $src }}"
+      >
+      {{ $imgClassFallback := "lazy-image" }}
+      {{ if $class }}{{ $imgClassFallback = printf "%s %s" $imgClassFallback $class }}{{ end }}
+      {{ if $noLazy }}{{ $imgClassFallback = printf "%s %s" $imgClassFallback "loaded" }}{{ end }}
+      <img
+        {{ if $noLazy }}
+        src="{{ $fallbackSrc }}"
+        {{ else }}
+        data-src="{{ $fallbackSrc }}"
+        {{ end }}
+        alt="{{ $alt }}"
+        class="{{ $imgClassFallback }}"{{ if $id }}
+        id="{{ $id }}"{{ end }}
+        {{ if $width }}width="{{ $width }}"{{ end }}
+        {{ if $height }}height="{{ $height }}"{{ end }}
+        {{ if not $noLazy }}loading="lazy"{{ end }}
+        decoding="async"
+        data-original-src="{{ $src }}"
+      >
+    </picture>
+{{ end }}

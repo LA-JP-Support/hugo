@@ -1,0 +1,247 @@
+{{/* Search Field Partial */}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.6.2/fuse.min.js" integrity="sha512-Nqw1tH3mpavka9cQCc5zWWEZNfIPdOYyQFjlV1NvflEtQ0/XI6ZQ+H/D3YgJdqSUJlMLAPRj/oXlaHCFbFCjoQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<div class="relative w-full max-w-sm mt-12">
+    <div class="relative flex items-center">
+        <input type="text" id="popup-search-input" class="w-full px-9 py-1.5 text-sm border surface-border rounded-md surface-primary placeholder:text-placeholder focus:outline-none focus:ring-2" placeholder="{{ i18n "search_placeholder" }}" aria-label="{{ i18n "search_placeholder" }}">
+        <button type="button" class="absolute left-1.5" aria-label="{{ i18n "search_submit_aria" }}">
+            {{ partial "icons/magnifying-glass" "w-4 h-4 icon-secondary" }}
+        </button>
+        <button type="button" id="clear-search" class="absolute right-1.5 hidden" aria-label="{{ i18n "search_clear_aria" }}" title="{{ i18n "search_clear_title" }}">
+            {{ partial "icons/x-mark" "w-4 h-4 icon-secondary" }}
+        </button>
+    </div>
+    <div id="search-results-popup" class="absolute top-full left-0 w-full min-w-[320px] max-h-96 overflow-y-auto surface-primary border surface-border rounded-md shadow-lg z-50 mt-2 hidden sm:left-0 sm:w-full sm:transform-none max-sm:left-1/2 max-sm:w-[calc(100vw-2rem)] max-sm:-translate-x-1/2">
+        <div class="p-4">
+            <div id="popup-search-results"></div>
+            <div class="search-loading text-center py-2 text-body hidden">{{ i18n "search_loading" }}</div>
+            <div class="search-view-all text-center py-2 mt-2 border-t surface-border hidden">
+                <a href="/search" id="view-all-results" class="text-heading font-medium hover:underline">{{ i18n "search_view_all_results" }}</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Translation strings
+    const searchTranslations = {
+        searchNotAvailable: {{ i18n "search_not_available" | jsonify | safeJS }},
+        searchInitializing: {{ i18n "search_initializing" | jsonify | safeJS }},
+        searchErrorLoading: {{ i18n "search_error_loading" | jsonify | safeJS }},
+        searchErrorPerforming: {{ i18n "search_error_performing" | jsonify | safeJS }},
+        searchNoResults: {{ i18n "search_no_results" | jsonify | safeJS }},
+        searchNoContentPreview: {{ i18n "search_no_content_preview" | jsonify | safeJS }},
+        searchUntitled: {{ i18n "search_untitled" | jsonify | safeJS }}
+    };
+
+    // Make sure the required libraries are available
+    if (typeof Fuse === 'undefined') {
+        console.warn('Fuse.js is not loaded. Search functionality will be limited.');
+    }
+
+    if (typeof Mark === 'undefined') {
+        console.warn('Mark.js is not loaded. Highlighting will be disabled.');
+    }
+
+    // DOM Elements
+    const searchInput = document.getElementById('popup-search-input');
+    const searchResultsPopup = document.getElementById('search-results-popup');
+    const searchResults = document.getElementById('popup-search-results');
+    const loadingIndicator = document.querySelector('.search-loading');
+    const viewAllSection = document.querySelector('.search-view-all');
+    const viewAllLink = document.getElementById('view-all-results');
+    const clearButton = document.getElementById('clear-search');
+
+    // Global variables
+    let fuseInstance = null;
+    let debounceTimer;
+    let searchData = null;
+    let isSearchInitialized = false;
+
+    // --- Event Listeners ---
+
+    // Close popup when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!searchInput.contains(event.target) && !searchResultsPopup.contains(event.target)) {
+            searchResultsPopup.classList.add('hidden');
+        }
+    });
+
+    // Clear search functionality
+    clearButton.addEventListener('click', function() {
+        searchInput.value = '';
+        searchResultsPopup.classList.add('hidden');
+        clearButton.classList.add('hidden');
+        searchInput.focus();
+    });
+
+    // Show/hide clear button based on input content
+    function toggleClearButton() {
+        if (searchInput.value.trim().length > 0) {
+            clearButton.classList.remove('hidden');
+        } else {
+            clearButton.classList.add('hidden');
+        }
+    }
+
+    // Initialize search only when user interacts with the search input
+    searchInput.addEventListener('focus', initializeSearch);
+
+    // Handle input changes
+    searchInput.addEventListener('input', function() {
+        toggleClearButton();
+        clearTimeout(debounceTimer);
+
+        const query = this.value.trim();
+
+        if (query.length < 2) {
+            searchResultsPopup.classList.add('hidden');
+            return;
+        }
+
+        debounceTimer = setTimeout(() => performSearch(query), 300);
+    });
+
+    // --- Search Functions ---
+
+    /**
+     * Initializes the search mechanism (Fuse.js) by loading the index.
+     * Loads data only once.
+     */
+    function initializeSearch() {
+        if (typeof Fuse === 'undefined') {
+            searchResults.innerHTML = `<p>${searchTranslations.searchNotAvailable}</p>`;
+            searchResultsPopup.classList.remove('hidden');
+            return;
+        }
+
+        if (isSearchInitialized) {
+            return;
+        }
+
+        loadingIndicator.classList.remove('hidden');
+        searchResultsPopup.classList.remove('hidden');
+        searchResults.innerHTML = `<p>${searchTranslations.searchInitializing}</p>`;
+
+        fetch('/index.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!data || !Array.isArray(data) || data.length === 0) {
+                    console.error('Search index is empty or invalid:', data);
+                    throw new Error('Search index is empty or invalid');
+                }
+
+                searchData = data;
+                fuseInstance = new Fuse(data, {
+                    keys: ['title', 'content', 'tags'],
+                    includeScore: true,
+                    includeMatches: true,
+                    minMatchCharLength: 2,
+                    threshold: 0.4
+                });
+
+                isSearchInitialized = true;
+                loadingIndicator.classList.add('hidden');
+
+                const query = searchInput.value.trim();
+                if (query.length >= 2) {
+                    performSearch(query);
+                } else {
+                    searchResultsPopup.classList.add('hidden');
+                }
+            })
+            .catch(error => {
+                console.error('Search Initialization Error:', error);
+                loadingIndicator.classList.add('hidden');
+                searchResults.innerHTML = `<p>${searchTranslations.searchErrorLoading}</p>`;
+                searchResultsPopup.classList.remove('hidden');
+                isSearchInitialized = false;
+            });
+    }
+
+    /**
+     * Performs a search for the given query and displays the results.
+     * @param {string} query - The search query.
+     */
+    function performSearch(query) {
+        if (!fuseInstance) {
+            searchResults.innerHTML = `<p>${searchTranslations.searchInitializing}</p>`;
+            return;
+        }
+
+        try {
+            const results = fuseInstance.search(query);
+            loadingIndicator.classList.add('hidden');
+            searchResultsPopup.classList.remove('hidden');
+
+            viewAllLink.href = `/search?q=${encodeURIComponent(query)}`;
+
+            if (results.length > 0) {
+                const displayResults = results.slice(0, 5);
+                let html = '';
+
+                displayResults.forEach(({ item, matches }, index) => {
+                    let snippet = searchTranslations.searchNoContentPreview;
+
+                    if (item && typeof item.content === 'string' && item.content.trim().length > 0) {
+                        snippet = item.content.substring(0, Math.min(item.content.length, 80)) + '...';
+
+                        if (matches && Array.isArray(matches)) {
+                            const contentMatch = matches.find(m => m && m.key === 'content' && Array.isArray(m.indices) && m.indices.length > 0);
+
+                            if (contentMatch && contentMatch.indices && contentMatch.indices.length > 0) {
+                                const [matchStart, matchEnd] = contentMatch.indices[0];
+                                const contextLength = 40;
+
+                                const start = Math.max(0, matchStart - contextLength);
+                                const end = Math.min(item.content.length, matchEnd + contextLength);
+
+                                snippet = (start > 0 ? '...' : '') +
+                                          item.content.substring(start, end) +
+                                          (end < item.content.length ? '...' : '');
+                            }
+                        }
+                    }
+
+                    const title = item.title || searchTranslations.searchUntitled;
+                    const permalink = item.permalink || '#';
+
+                    const isLast = index === displayResults.length - 1;
+                    const borderClass = isLast ? '' : 'border-b border-gray-200 dark:border-gray-600';
+
+                    html += `
+                    <div class="py-3 ${borderClass}">
+                        <a href="${permalink}" class="no-underline text-inherit group">
+                            <div class="font-semibold text-gray-800 dark:text-gray-200 mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400">${title}</div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">${snippet}</div>
+                        </a>
+                    </div>`;
+                });
+
+                searchResults.innerHTML = html;
+                viewAllSection.classList.toggle('hidden', results.length <= 5);
+
+                if (typeof Mark !== 'undefined' && searchResults.children.length > 0) {
+                    const markInstance = new Mark(searchResults);
+                    markInstance.mark(query);
+                }
+            } else {
+                searchResults.innerHTML = `<p>${searchTranslations.searchNoResults}</p>`;
+                viewAllSection.classList.add('hidden');
+            }
+        } catch (error) {
+            console.error('Search execution error:', error);
+            searchResults.innerHTML = `<p>${searchTranslations.searchErrorPerforming}</p>`;
+            searchResultsPopup.classList.remove('hidden');
+        }
+    }
+});
+</script>

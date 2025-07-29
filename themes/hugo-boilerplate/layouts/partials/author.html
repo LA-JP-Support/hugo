@@ -1,0 +1,27 @@
+{{/* Author Partial */}}
+{{ $authorKey := .authorKey }}
+{{ $authorData := false }}
+
+{{/* First try to get author from content file */}}
+{{ $authorPath := printf "author/%s" $authorKey }}
+{{ with site.GetPage $authorPath }}
+  {{ if .Params.role }}
+    {{ $authorData = dict
+      "name" .Title
+      "role" .Params.role
+      "image" .Params.image
+      "description" .Params.description
+    }}
+  {{ end }}
+{{ end }}
+
+{{ if $authorData }}
+  {{ partial "sections/testimonials/with_large_avatar.html" (dict
+    "personName" $authorData.name
+    "personRole" $authorData.role
+    "personImage" $authorData.image
+    "personImageAlt" $authorData.name
+    "quote" $authorData.description
+  ) }}
+  {{ partial "schemaorg/author.html" . }}
+{{ end }}

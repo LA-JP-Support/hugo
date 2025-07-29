@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="{{ site.Language.LanguageCode }}" dir="{{ or site.Language.LanguageDirection `ltr` }}">
+<head>
+  {{ partialCached "head.html" . .Permalink }}
+</head>
+<body class="antialiased bg-white">
+<!-- Initialize linkbuilding tracking for all pages -->
+{{ .Scratch.Set "processedLinks" slice }}
+
+{{ partialCached "header.html" . (printf "header-%s" site.Language.Lang) }}
+<main class="w-full">
+  {{ block "main" . }}{{ end }}
+</main>
+
+{{ partial "footer.html" . }}
+
+<!-- Cookie Consent Banner -->
+{{ partialCached "cookies-bar" (dict
+  "policyText" "privacy policy"
+  "policyUrl" "/privacy-policy/"
+  "theme" "dark"
+) }}
+
+<!-- App JavaScript - non-critical interactions -->
+<script src="/js/app.js?v={{ partialCached "helpers/build-timestamp.html" . }}"></script>
+</body>
+</html>
